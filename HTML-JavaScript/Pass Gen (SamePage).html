@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pass Gen XI</title>
+
+    <!-- LinkS -->
+    <style>
+        body {
+            padding: 25px;
+        }
+
+        #mainContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        /* #mainContainer {
+            display: block;
+            justify-content: center;
+            align-items: flex-start;
+        } */
+
+        .credradio {
+            justify-content: space-around;
+            width: 60px;
+            align-content: center;
+            height: 15px;
+        }
+
+        #radioGen {
+            /* display: flex; */
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        #credLength, #genButton, #genDisplay {
+            margin-bottom: 15px;
+        }
+
+        /* #number {
+            
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        } */
+
+        #credLength {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 5px;
+        }
+
+        #genButton, #toKlipBoard {
+            border-radius: 11px;
+            cursor: pointer;
+            height: 30px;
+            width: 100%;
+        }
+
+        #genButton {
+            background-color: #2D56C6;
+            color: #fff;
+        }
+
+        #genDisplay {
+            width: 100%;
+            height: 250px ;
+        }
+
+        .copyright {
+            margin: 35px auto;
+            padding: 10px;  
+            color: #022900;
+            text-align: center;
+            margin: 2px;
+            align-content: center;
+            font-size: 1.1em;
+            font-style: italic;
+        }
+
+        /* Media Queries: */
+        @media (max-width: 948px) {
+            
+            h1 {
+                font-size: 20px;
+            }
+            h2 {
+                font-size: 16px;
+            }
+            h3 {
+                font-size: 14px;
+            }
+            .copyright {
+                font-size: 12px;
+            }
+            
+        }
+
+    </style>
+
+</head>
+<body>
+    <div id="mainContainer">
+        <!-- Header -->
+        
+        
+        <!-- Contolls -->
+        <div class="controls">
+            <div class="head">
+                <h1 id="mainHeader">Password GeneratoR</h1>
+            </div>
+            
+            <div id="radioGen">
+                <input type="radio" name="typeOfCredntial" value="pass" class="credradio">
+                <label for="Password">Password</label>
+                <input type="radio" name="typeOfCredntial" value="code" class="credradio">
+                <label for="Passcode">Passcode</label>
+            </div>
+            
+            <div id="number">
+                <input type="text" name="passLength" id="credLength" placeholder="Enter length to generate">
+            </div>
+
+                <button id="genButton">Generate</button>
+            
+
+             <!-- Display -->
+            <div class="displayer">
+                <textarea id="genDisplay" class="generatedPass" readonly></textarea>
+
+                <button id="toKlipBoard" disabled>Copy to clipboard</button>
+            </div>
+        </div>
+
+       
+
+    </div>
+    <div class="copyright">
+        <span>
+            <em>&copy 2025 TRILLDAYs Tech. All Rights Reserved.</em>
+        </span>
+    </div>
+
+    <script>
+        // Main controlleR
+document.addEventListener('DOMContentLoaded', () => {
+    // Collecting by ID:
+    const credNumberInput = document.getElementById('credLength'); // number input
+    const display = document.getElementById('genDisplay'); //Crednetial displayer
+    const copy = document.getElementById('toKlipBoard');
+
+    let NUM_CHARS = "0123456789" //list of digits to use to generate
+    let STRING_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!\\$%^&*()_\"-+=.,<>{}[]:;?" //List of chars to generate from
+
+
+    // Button click listener:
+    document.getElementById('genButton').addEventListener('click', function() {
+
+        try {
+            const enteredLength = credNumberInput.value; // Collecting the number input
+
+            //validate the enetered number
+            if(isNaN(enteredLength)) {
+                throw new Error("Invalid number format");
+            }
+
+            //validating the enetred number being empty
+            if (!enteredLength) {
+                throw new Error("No enetered number");
+            }
+
+            // Get the selected radio button value
+            const selectedCred = document.querySelector('input[name="typeOfCredntial"]:checked');
+
+            // Validate selected value:
+            if (!selectedCred) {
+                //Display Error message
+                alert("Please enter a credential type")
+            }
+
+            // Determine key length based on selected value
+            let credType;
+            switch (selectedCred.value) {
+                case 'pass':
+                    credType = "pWord";
+                break;
+                case 'code':
+                    credType = "pCode";
+                break;
+            }
+
+            // Validating if inout number entered
+            if (!enteredLength){
+                alert("Please enter a valid number")
+            } else {
+                if (enteredLength > 1000) {
+                    alert("Please enter a number less that 1000 to generate")
+                } else {
+                    //enable copy button:
+                    copy.disabled = false;
+                    display.textContent = makePassCred(enteredLength, credType);
+                }
+                
+            }
+
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+        
+    });
+
+    //Password generator Algorythm
+    function makePassCred(pLength, cType) {
+        // let random = random(System.currentTimeMillis())
+
+        switch (cType) {
+            case "pWord":
+                return Array.from({ length: pLength }, () => {
+                    const randomIndex = Math.floor(Math.random() * STRING_CHARS.length);
+                    return STRING_CHARS[randomIndex];
+                }).join("");
+            
+            case "pCode":
+                return Array.from({ length: pLength }, () => {
+                    const randomIndex = Math.floor(Math.random() * NUM_CHARS.length);
+                    return NUM_CHARS[randomIndex];
+                }).join("");
+        
+            default:
+                throw new Error("Invalid credential type");
+        }
+    }
+
+    //Copy to clipboard Button Click
+    copy.addEventListener('click', () => {
+        display.select();
+        document.execCommand('copy');
+        alert('Text copied to clipboard');
+    });
+
+
+});
+
+
+    </script>
+
+</body>
+</html>
